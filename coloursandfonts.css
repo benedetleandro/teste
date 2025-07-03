@@ -1,0 +1,87 @@
+/* Importa a fonte Inter do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Cores */
+    --primary-text-color: #2d3748;
+    --title-color: #2c5282;
+    --background-gradient-start: #f0f4f8;
+    --background-gradient-end: #dbe4ee;
+    --table-background: #ffffff;
+    --table-shadow-color: rgba(0, 0, 0, 0.08);
+    --border-color: #cbd5e0;
+    --header-background: #4a5568;
+    --header-text-color: #ffffff;
+    --editable-cell-background: #f7fafc;
+    --footer-background: #e2e8f0;
+    --keyboard-background: #ffffff;
+    --keyboard-border-color: #e2e8f0;
+    --keyboard-shadow-color: rgba(0, 0, 0, 0.1);
+    --button-background: #63b3ed;
+    --button-hover-background: #4299e1;
+    --button-active-background: #3182ce;
+    --button-text-color: #ffffff;
+    --clear-button-background: #e53e3e;
+    --clear-button-hover-background: #c53030;
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Fonte Inter */
+    background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end)); /* Gradiente suave de azul claro/cinza */
+    color: var(--primary-text-color); /* Cor de texto padrão */
+}
+
+h2 {
+    color: var(--title-color); /* Azul escuro para títulos */
+}
+
+.table-container {
+    background: var(--table-background); /* Fundo branco */
+    box-shadow: 0 4px 12px var(--table-shadow-color); /* Sombra suave */
+}
+
+th, td {
+    border: 1px solid var(--border-color); /* Bordas cinza mais suaves */
+}
+
+th {
+    background-color: var(--header-background); /* Cinza escuro para cabeçalhos */
+    color: var(--header-text-color); /* Texto branco */
+}
+
+td[contenteditable] {
+    background-color: var(--editable-cell-background); /* Um branco bem suave para células editáveis */
+}
+
+tfoot td {
+    background-color: var(--footer-background); /* Um cinza azulado claro para o rodapé */
+}
+
+/* Estilos para o teclado virtual */
+#virtual-keyboard {
+    background-color: var(--keyboard-background); /* Fundo branco para o teclado */
+    border: 1px solid var(--keyboard-border-color); /* Borda suave */
+    box-shadow: 0 2px 10px var(--keyboard-shadow-color);
+}
+
+#virtual-keyboard button {
+    background-color: var(--button-background); /* Azul claro para botões numéricos */
+    color: var(--button-text-color); /* Texto branco */
+}
+
+#virtual-keyboard button:hover {
+    background-color: var(--button-hover-background); /* Azul um pouco mais escuro ao passar o mouse */
+}
+
+#virtual-keyboard button:active {
+    background-color: var(--button-active-background); /* Azul mais escuro ao clicar */
+}
+
+#virtual-keyboard .clear-button {
+    background-color: var(--clear-button-background); /* Vermelho suave para o botão DEL */
+    color: var(--button-text-color); /* Texto branco */
+}
+
+#virtual-keyboard .clear-button:hover {
+    background-color: var(--clear-button-hover-background);
+}

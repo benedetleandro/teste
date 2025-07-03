@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Schüsse</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(135deg, #f2f4f8, #d9e2ec);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 15px;
+            position: relative; /* Para posicionar o teclado virtual */
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 40px;
+            color: #333;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            overflow-x: auto;
+            margin-bottom: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 500px;
+        }
+
+        colgroup col {
+            width: 60px;
+        }
+
+        colgroup col:last-child {
+            width: 80px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: right;
+        }
+
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        td[contenteditable] {
+            background-color: #fffef9;
+            cursor: pointer; /* Indica que é clicável */
+        }
+
+        tfoot td {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        /* Estilos para o teclado virtual */#virtual-keyboard {
+    display: none; /* Mantém escondido por padrão */
+    position: absolute;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 210px;
+    z-index: 1000;
+}
+
+#virtual-keyboard button {
+    background-color: #e0e0e0; /* Cor padrão para todos os botões, incluindo números */
+    border: none;
+    padding: 15px;
+    font-size: 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #333; /* Adicionado para garantir a cor do texto para números */
+}
+
+#virtual-keyboard button:hover {
+    background-color: #d0d0d0;
+}
+
+#virtual-keyboard button:active {
+    background-color: #c0c0c0;
+}
+
+/* O .zero-button e .ten-button não precisam mais de estilos específicos de cor,
+   eles herdarão o background-color: #e0e0e0; do #virtual-keyboard button. */
+
+#virtual-keyboard .clear-button {
+    background-color: #f44336; /* Cor vermelha para o botão DEL */
+    color: white; /* Texto branco para o botão DEL */
+}
+
+#virtual-keyboard .clear-button:hover {
+    background-color: #d32f2f;
+}
+
+        /* Media queries para responsividade */
+/* ... (Seu CSS existente) ... */
+
+@media (max-width: 600px) {
+    /* ... (Seu CSS de media query existente) ... */
+
+    /* Remova o min-width da tabela para permitir que ela encolha */
+    table {
+        min-width: unset; /* ou min-width: auto; */
+        font-size: 14px;
+        display: block; /* A tabela agora se comporta como um bloco para permitir a reestruturação */
+    }
+
+    /* Oculta o thead (cabeçalho) em telas pequenas, pois cada item terá seu rótulo */
+    thead {
+        display: none;
+    }
+
+    /* Faz o tbody se comportar como um bloco */
+    tbody {
+        display: block;
+        width: 100%;
+    }
+
+    /* Estilo para cada linha (tr) da tabela */
+    tr {
+        display: block;
+        margin-bottom: 15px; /* Espaço entre os "cards" */
+        border: 1px solid #eee;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        background-color: white;
+        padding: 10px;
+    }
+
+    /* Estilo para cada célula (td) da tabela */
+    td {
+        display: flex; /* Flexbox para alinhar rótulo e valor */
+        justify-content: space-between; /* Alinha o rótulo à esquerda e o valor à direita */
+        padding: 8px 0; /* Padding interno */
+        border: none; /* Remove bordas internas da célula */
+        border-bottom: 1px solid #f0f0f0; /* Linha divisória entre os campos */
+    }
+
+    /* Remove a borda da última célula de cada linha */
+    td:last-child {
+        border-bottom: none;
+        padding-top: 10px; /* Mais espaço para o total */
+        font-weight: bold;
+        color: #0056b3; /* Cor para o total da linha */
+    }
+
+    /* Adiciona rótulos para as células editáveis usando data attributes e pseudo-elementos */
+    td[contenteditable]:nth-of-type(1)::before { content: "1:"; font-weight: bold; margin-right: 10px; color: #555; }
+    td[contenteditable]:nth-of-type(2)::before { content: "2:"; font-weight: bold; margin-right: 10px; color: #555; }
+    td[contenteditable]:nth-of-type(3)::before { content: "3:"; font-weight: bold; margin-right: 10px; color: #555; }
+    td[contenteditable]:nth-of-type(4)::before { content: "4:"; font-weight: bold; margin-right: 10px; color: #555; }
+    td[contenteditable]:nth-of-type(5)::before { content: "5:"; font-weight: bold; margin-right: 10px; color: #555; }
+    td:last-child::before { content: "Soma da Linha:"; font-weight: bold; margin-right: 10px; color: #333; }
+
+
+    /* Estilo para o tfoot em telas pequenas */
+    tfoot {
+        display: block; /* Faz o tfoot se comportar como um bloco */
+        margin-top: 20px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    tfoot tr {
+        display: flex; /* Flexbox para o total */
+        justify-content: space-between; /* Alinha "Summe" e valor */
+        margin: 0; /* Remove margem extra */
+        border: none; /* Remove bordas dos tr no tfoot */
+        box-shadow: none;
+        padding: 0;
+    }
+
+    tfoot td {
+        border: none; /* Remove bordas dos td no tfoot */
+        padding: 0;
+        text-align: left; /* Ajusta o alinhamento do texto */
+    }
+
+    tfoot td:last-child {
+        padding-top: 0; /* Remove padding extra */
+        font-size: 1.1em;
+        color: #007bff; /* Cor para o total geral */
+    }
+}    </style>
+</head>
+<body>
+
+    <div class="table-container">
+        <table id="table1">
+            <colgroup>
+                <col><col><col><col><col><col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>(Summe)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+            </tbody>
+            <tfoot>
+                <tr><td colspan="5">Summe</td><td id="total1"></td></tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <table id="table2">
+            <colgroup>
+                <col><col><col><col><col><col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>(Summe)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+                <tr><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td contenteditable></td><td></td></tr>
+            </tbody>
+            <tfoot>
+                <tr><td colspan="5">Summe</td><td id="total2"></td></tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <tr>
+                <td><strong>Summe 1 - 12</strong></td>
+                <td id="totalGeral" style="font-weight:bold; text-align:right;"></td>
+            </tr>
+        </table>
+    </div>
+
+<div id="virtual-keyboard">
+    <button data-value="1">1</button>
+    <button data-value="2">2</button>
+    <button data-value="3">3</button>
+    <button data-value="4">4</button>
+    <button data-value="5">5</button>
+    <button data-value="6">6</button>
+    <button data-value="7">7</button>
+    <button data-value="8">8</button>
+    <button data-value="9">9</button>
+    <button data-value="10" class="ten-button">10</button>
+    <button data-value="0" class="zero-button">0</button>
+    <button class="clear-button" data-action="clear">DEL</button> </div>
+
+    <script>
+        let activeCell = null; // Variável para armazenar a célula que está sendo editada
+
+        function updateSums(tableId, totalId) {
+            const table = document.getElementById(tableId);
+            let total = 0;
+
+            for (let row of table.tBodies[0].rows) {
+                let rowSum = 0;
+                // Itera pelas primeiras 5 células (colunas 1 a 5)
+                for (let i = 0; i < 5; i++) {
+                    let val = parseFloat(row.cells[i].textContent.replace(',', '.')); // Troca vírgula por ponto para parseFloat
+                    if (!isNaN(val)) rowSum += val;
+                }
+                // Atualiza a 6ª célula (coluna de soma)
+                row.cells[5].textContent = rowSum.toFixed(2).replace('.', ','); // Volta a vírgula para exibição
+                total += rowSum;
+            }
+
+            document.getElementById(totalId).textContent = total.toFixed(2).replace('.', ','); // Volta a vírgula para exibição
+            return total;
+        }
+
+        function updateAll() {
+            const total1 = updateSums("table1", "total1");
+            const total2 = updateSums("table2", "total2");
+            const totalGeral = total1 + total2;
+            document.getElementById("totalGeral").textContent = totalGeral.toFixed(2).replace('.', ','); // Volta a vírgula para exibição
+        }
+
+        // Lógica do teclado virtual
+        const virtualKeyboard = document.getElementById('virtual-keyboard');
+        const editableCells = document.querySelectorAll('td[contenteditable]');
+
+        editableCells.forEach(cell => {
+            cell.addEventListener('click', (event) => {
+                activeCell = event.target;
+                virtualKeyboard.style.display = 'grid'; // Mostra o teclado
+
+                // Posiciona o teclado abaixo da célula clicada
+                const cellRect = activeCell.getBoundingClientRect();
+                const bodyRect = document.body.getBoundingClientRect();
+
+                virtualKeyboard.style.top = `${cellRect.bottom + window.scrollY + 5}px`;
+                virtualKeyboard.style.left = `${cellRect.left + window.scrollX}px`;
+
+                // Ajusta a posição se o teclado sair da tela à direita
+                if (cellRect.left + virtualKeyboard.offsetWidth > window.innerWidth) {
+                    virtualKeyboard.style.left = `${window.innerWidth - virtualKeyboard.offsetWidth - 10}px`;
+                }
+                // Ajusta a posição se o teclado sair da tela para cima (menos provável, mas bom ter)
+                if (cellRect.top - virtualKeyboard.offsetHeight < 0 && cellRect.bottom + virtualKeyboard.offsetHeight + 10 > window.innerHeight) {
+                    virtualKeyboard.style.top = `${window.scrollY + 10}px`;
+                }
+
+                // Coloca o cursor no final do texto existente na célula
+                if (activeCell.textContent.length > 0) {
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.setStart(activeCell.firstChild, activeCell.textContent.length);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } else {
+                    activeCell.focus(); // Foca na célula se estiver vazia
+                }
+            });
+
+            // Adiciona evento de input para a célula para capturar digitação manual e atualizar somas
+            // Embora o teclado nativo esteja desabilitado, é uma boa prática manter.
+            cell.addEventListener('input', updateAll);
+        });
+
+        virtualKeyboard.addEventListener('click', (event) => {
+            if (!event.target.matches('button')) return; // Garante que apenas cliques em botões sejam processados
+
+            const value = event.target.dataset.value;
+            const action = event.target.dataset.action;
+
+            if (activeCell) {
+                if (action === 'clear') {
+                    activeCell.textContent = '';
+                } else if (value) {
+                    // Impede múltiplos pontos decimais (se o botão fosse reintroduzido)
+                    // if (value === '.' && activeCell.textContent.includes('.')) {
+                    //     return;
+                    // }
+
+                    // Validação para permitir apenas números (0-9)
+                    if (!/^\d$/.test(value)) {
+                        return; // Ignora cliques que não são dígitos numéricos
+                    }
+
+                    // Permite que o número '10' seja inserido e outros dígitos múltiplos
+                    if (activeCell.textContent === '' || activeCell.textContent === '0') {
+                        activeCell.textContent = value;
+                    } else {
+                        // Limita a dois dígitos para permitir apenas números de 0 a 10
+                        if (activeCell.textContent.length >= 2) {
+                             // Se já tem dois dígitos, verifica se é "10"
+                             if (activeCell.textContent === "1" && value === "0") {
+                                activeCell.textContent = "10"; // Permite formar 10
+                             }
+                            return; // Se já tem 2 dígitos e não é para formar "10", impede
+                        }
+
+                        activeCell.textContent += value;
+                    }
+
+                    // Regra específica para o número 10
+                    if (activeCell.textContent.length > 2 || (activeCell.textContent.length === 2 && activeCell.textContent !== '10')) {
+                        activeCell.textContent = ''; // Limpa se for algo como "11" ou "12"
+                    }
+                }
+                updateAll(); // Atualiza as somas após cada inserção/limpeza
+            }
+        });
+
+        // Esconder o teclado quando clicar fora da célula ativa ou do teclado
+        document.addEventListener('click', (event) => {
+            if (activeCell && !activeCell.contains(event.target) && !virtualKeyboard.contains(event.target)) {
+                virtualKeyboard.style.display = 'none';
+                activeCell = null;
+            }
+        });
+
+        // Garante que as somas sejam calculadas na carga inicial da página
+        window.addEventListener('DOMContentLoaded', updateAll);
+
+        // Desabilita o teclado nativo do navegador para as células editáveis
+        editableCells.forEach(cell => {
+            cell.setAttribute('inputmode', 'none');
+            // Mantém readonly para evitar teclado nativo, mas o JS vai gerenciar o input
+            cell.setAttribute('readonly', 'readonly');
+        });
+
+    </script>
+</body>
+</html>
